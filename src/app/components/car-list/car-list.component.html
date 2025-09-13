@@ -1,0 +1,146 @@
+<div class="car-list-container">
+  <div class="header">
+    <h1>Find Your Perfect Vehicle</h1>
+    <p>Browse through our selection of quality cars, bikes, leisure, and commercial vehicles</p>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        placeholder="Search by make, model, color, or location..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        class="search-input"
+      >
+    </div>
+
+    <div class="filters">
+      <select 
+        [ngModel]="selectedCategory()"
+        (ngModelChange)="selectedCategory.set($event)"
+        class="filter-select"
+      >
+        <option value="">All Categories</option>
+        @for (category of categories; track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+
+      <select 
+        [ngModel]="selectedMake()"
+        (ngModelChange)="selectedMake.set($event)"
+        class="filter-select"
+      >
+        <option value="">All Makes</option>
+        @for (make of makes; track make) {
+          <option [value]="make">{{ make }}</option>
+        }
+      </select>
+
+      <input 
+        type="number" 
+        placeholder="Max Price"
+        [ngModel]="maxPrice()"
+        (ngModelChange)="maxPrice.set($event ? +$event : null)"
+        class="filter-input"
+      >
+
+      <select 
+        [ngModel]="selectedFuelType()"
+        (ngModelChange)="selectedFuelType.set($event)"
+        class="filter-select"
+      >
+        <option value="">All Fuel Types</option>
+        @for (fuelType of fuelTypes; track fuelType) {
+          <option [value]="fuelType">{{ fuelType }}</option>
+        }
+      </select>
+
+      <select 
+        [ngModel]="selectedTransmission()"
+        (ngModelChange)="selectedTransmission.set($event)"
+        class="filter-select"
+      >
+        <option value="">All Transmissions</option>
+        @for (transmission of transmissions; track transmission) {
+          <option [value]="transmission">{{ transmission }}</option>
+        }
+      </select>
+
+      <button (click)="clearFilters()" class="clear-filters-btn">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-info">
+    <p>{{ filteredVehicles.length }} vehicle{{ filteredVehicles.length !== 1 ? 's' : '' }} found</p>
+  </div>
+
+  <!-- Vehicle Grid -->
+  <div class="cars-grid">
+    @for (vehicle of filteredVehicles; track vehicle.id) {
+      <div class="car-card" [routerLink]="['/vehicle', vehicle.id]" style="cursor: pointer;">
+        <div class="car-image">
+          <img [src]="vehicle.imageUrl" [alt]="vehicle.make + ' ' + vehicle.model" loading="lazy">
+          <div class="car-badge">{{ vehicle.condition }}</div>
+          <div class="category-badge">{{ vehicle.category }}</div>
+          <div class="view-overlay">
+            <span class="view-text">View Details</span>
+          </div>
+        </div>
+        
+        <div class="car-info">
+          <h3 class="car-title">{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h3>
+          <p class="car-price">{{ formatPrice(vehicle.price) }}</p>
+          <p class="category-details">{{ getCategorySpecificDetails(vehicle) }}</p>
+          
+          <div class="car-details">
+            <div class="detail-item">
+              <span class="detail-label">Mileage:</span>
+              <span class="detail-value">{{ formatMileage(vehicle.mileage) }} miles</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Color:</span>
+              <span class="detail-value">{{ vehicle.color }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Fuel:</span>
+              <span class="detail-value">{{ vehicle.fuelType }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Transmission:</span>
+              <span class="detail-value">{{ vehicle.transmission }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Location:</span>
+              <span class="detail-value">{{ vehicle.location }}</span>
+            </div>
+          </div>
+          
+          <p class="car-description">{{ vehicle.description }}</p>
+          
+          <div class="car-seller">
+            <p><strong>Seller:</strong> {{ vehicle.sellerName }}</p>
+            <p><strong>Contact:</strong> {{ vehicle.sellerContact }}</p>
+          </div>
+          
+          <div class="car-actions">
+            <button class="contact-btn">Contact Seller</button>
+            <button class="favorite-btn">♡</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (filteredVehicles.length === 0) {
+    <div class="no-results">
+      <h3>No vehicles found</h3>
+      <p>Try adjusting your search criteria or clear the filters to see all available vehicles.</p>
+    </div>
+  }
+</div>

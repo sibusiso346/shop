@@ -1,0 +1,222 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>Welcome to Vehicle Marketplace</h1>
+      <p>Find your perfect car, bike, leisure, or commercial vehicle from our extensive collection</p>
+      <div class="hero-actions">
+        <a routerLink="/vehicles" class="btn btn-primary">Browse All Vehicles</a>
+        <a routerLink="/sell" class="btn btn-secondary">Sell Your Vehicle</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Vehicles Section -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Recently Added</h2>
+      <p>Check out the latest 6 vehicles added to our marketplace</p>
+    </div>
+    <div class="vehicles-grid">
+      @for (vehicle of recentVehicles; track vehicle.id) {
+        <div class="vehicle-card" [routerLink]="['/vehicle', vehicle.id]" style="cursor: pointer;">
+          <div class="vehicle-image">
+            <img [src]="vehicle.imageUrl" [alt]="vehicle.make + ' ' + vehicle.model" loading="lazy">
+            <div class="vehicle-badges">
+              <span class="category-badge">{{ vehicle.category }}</span>
+              <span class="condition-badge">{{ vehicle.condition }}</span>
+            </div>
+            <div class="view-overlay">
+              <span class="view-text">View Details</span>
+            </div>
+          </div>
+          <div class="vehicle-info">
+            <h3>{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h3>
+            <p class="price">{{ formatPrice(vehicle.price) }}</p>
+            <p class="details">{{ getCategorySpecificDetails(vehicle) }}</p>
+            <p class="location">{{ vehicle.location }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Most Searched Vehicles Section -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Most Popular</h2>
+      <p>These 6 vehicles are getting the most attention from buyers</p>
+    </div>
+    <div class="vehicles-grid">
+      @for (vehicle of mostSearchedVehicles; track vehicle.id) {
+        <div class="vehicle-card" [routerLink]="['/vehicle', vehicle.id]" style="cursor: pointer;">
+          <div class="vehicle-image">
+            <img [src]="vehicle.imageUrl" [alt]="vehicle.make + ' ' + vehicle.model" loading="lazy">
+            <div class="vehicle-badges">
+              <span class="category-badge">{{ vehicle.category }}</span>
+              <span class="popular-badge">🔥 Popular</span>
+            </div>
+            <div class="view-overlay">
+              <span class="view-text">View Details</span>
+            </div>
+          </div>
+          <div class="vehicle-info">
+            <h3>{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h3>
+            <p class="price">{{ formatPrice(vehicle.price) }}</p>
+            <p class="details">{{ getCategorySpecificDetails(vehicle) }}</p>
+            <p class="location">{{ vehicle.location }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Perfect Condition Vehicles Section -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Perfect Condition</h2>
+      <p>Premium vehicles in excellent condition</p>
+    </div>
+    <div class="vehicles-grid perfect-grid">
+      @for (vehicle of perfectConditionVehicles; track vehicle.id) {
+        <div class="vehicle-card premium-card">
+          <div class="vehicle-image">
+            <img [src]="vehicle.imageUrl" [alt]="vehicle.make + ' ' + vehicle.model" loading="lazy">
+            <div class="vehicle-badges">
+              <span class="category-badge">{{ vehicle.category }}</span>
+              <span class="premium-badge">⭐ Premium</span>
+            </div>
+          </div>
+          <div class="vehicle-info">
+            <h3>{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h3>
+            <p class="price">{{ formatPrice(vehicle.price) }}</p>
+            <p class="details">{{ getCategorySpecificDetails(vehicle) }}</p>
+            <p class="location">{{ vehicle.location }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section class="about-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>About Vehicle Marketplace</h2>
+        <p>Your trusted partner in buying and selling vehicles for over 15 years</p>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats-grid">
+        @for (stat of stats; track stat.label) {
+          <div class="stat-item">
+            <div class="stat-number">{{ stat.number }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        }
+      </div>
+
+      <!-- Values -->
+      <div class="values-grid">
+        @for (value of values; track value.title) {
+          <div class="value-card">
+            <div class="value-icon">{{ value.icon }}</div>
+            <h3>{{ value.title }}</h3>
+            <p>{{ value.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="reviews-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Our Customers Say</h2>
+        <div class="rating-summary">
+          <span class="rating-number">{{ reviewStats.averageRating }}</span>
+          <div class="stars">
+            @for (star of getStars(getFloorRating(reviewStats.averageRating)); track $index) {
+              <span class="star filled">⭐</span>
+            }
+          </div>
+          <p>Based on {{ reviewStats.totalReviews }} reviews</p>
+        </div>
+      </div>
+      
+      <div class="reviews-grid">
+        @for (review of reviews; track review.id) {
+          <div class="review-card">
+            <div class="review-header">
+              <div class="customer-info">
+                <img [src]="review.customerImage" [alt]="review.customerName" class="customer-avatar">
+                <div class="customer-details">
+                  <h4>{{ review.customerName }}</h4>
+                  <p class="vehicle-purchased">{{ review.vehicle }}</p>
+                  @if (review.verified) {
+                    <span class="verified-badge">✓ Verified</span>
+                  }
+                </div>
+              </div>
+              <div class="review-meta">
+                <div class="rating">
+                  @for (star of getStars(review.rating); track $index) {
+                    <span class="star filled">⭐</span>
+                  }
+                </div>
+                <p class="review-date">{{ formatDate(review.date) }}</p>
+              </div>
+            </div>
+            <div class="review-content">
+              <p>{{ review.review }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Get in Touch</h2>
+        <p>Have questions? We're here to help!</p>
+      </div>
+      
+      <div class="contact-info-grid">
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <h3>Call Us</h3>
+          <p>+1 (555) 123-4567</p>
+          <p>Mon-Fri: 9AM-6PM</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <h3>Email Us</h3>
+          <p>info@vehiclemarketplace.com</p>
+          <p>support@vehiclemarketplace.com</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <h3>Visit Us</h3>
+          <p>123 Vehicle Street</p>
+          <p>Auto City, AC 12345</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Find Your Perfect Vehicle?</h2>
+      <p>Join thousands of satisfied customers who found their dream vehicle with us</p>
+      <div class="cta-actions">
+        <a routerLink="/vehicles" class="btn btn-primary btn-large">Start Browsing</a>
+        <a routerLink="/sell" class="btn btn-outline btn-large">List Your Vehicle</a>
+      </div>
+    </div>
+  </section>
+</div>

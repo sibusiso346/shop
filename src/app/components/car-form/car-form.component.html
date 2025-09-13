@@ -1,0 +1,389 @@
+<div class="car-form-container">
+  <div class="form-header">
+    <h1>Sell Your Vehicle</h1>
+    <p>List your vehicle and connect with potential buyers</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="car-form">
+    <div class="form-section">
+      <h3>Vehicle Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Vehicle Category *</label>
+          <select 
+            id="category"
+            [(ngModel)]="vehicle.category"
+            (ngModelChange)="onCategoryChange()"
+            name="category"
+            required
+          >
+            @for (category of categories; track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="make">Make *</label>
+          <select 
+            id="make"
+            [(ngModel)]="vehicle.make"
+            name="make"
+            required
+          >
+            <option value="">Select Make</option>
+            @for (make of makes; track make) {
+              <option [value]="make">{{ make }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+
+        <div class="form-group">
+          <label for="model">Model *</label>
+          <input 
+            type="text" 
+            id="model"
+            [(ngModel)]="vehicle.model"
+            name="model"
+            placeholder="e.g., Camry, Civic, Model 3"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="year">Year *</label>
+          <select 
+            id="year"
+            [(ngModel)]="vehicle.year"
+            name="year"
+            required
+          >
+            @for (year of years; track year) {
+              <option [value]="year">{{ year }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="color">Color *</label>
+          <input 
+            type="text" 
+            id="color"
+            [(ngModel)]="vehicle.color"
+            name="color"
+            placeholder="e.g., Silver, Blue, White"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fuelType">Fuel Type *</label>
+          <select 
+            id="fuelType"
+            [(ngModel)]="vehicle.fuelType"
+            name="fuelType"
+            required
+          >
+            @for (fuelType of fuelTypes; track fuelType) {
+              <option [value]="fuelType">{{ fuelType }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="transmission">Transmission *</label>
+          <select 
+            id="transmission"
+            [(ngModel)]="vehicle.transmission"
+            name="transmission"
+            required
+          >
+            @for (transmission of transmissions; track transmission) {
+              <option [value]="transmission">{{ transmission }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="condition">Condition *</label>
+          <select 
+            id="condition"
+            [(ngModel)]="vehicle.condition"
+            name="condition"
+            required
+          >
+            @for (condition of conditions; track condition) {
+              <option [value]="condition">{{ condition }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="mileage">Mileage *</label>
+          <input 
+            type="number" 
+            id="mileage"
+            [(ngModel)]="vehicle.mileage"
+            name="mileage"
+            placeholder="e.g., 35000"
+            min="0"
+            required
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Category-specific fields -->
+    <div class="form-section" *ngIf="vehicle.category">
+      <h3>{{ vehicle.category }} Specific Details</h3>
+      
+      <!-- Cars specific fields -->
+      <div *ngIf="vehicle.category === 'Cars'" class="form-row">
+        <div class="form-group">
+          <label for="doors">Number of Doors *</label>
+          <input 
+            type="number" 
+            id="doors"
+            [(ngModel)]="vehicle.doors"
+            name="doors"
+            placeholder="e.g., 4"
+            min="2"
+            max="5"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="seats">Number of Seats *</label>
+          <input 
+            type="number" 
+            id="seats"
+            [(ngModel)]="vehicle.seats"
+            name="seats"
+            placeholder="e.g., 5"
+            min="2"
+            max="9"
+            required
+          >
+        </div>
+      </div>
+
+      <!-- Bikes specific fields -->
+      <div *ngIf="vehicle.category === 'Bikes'" class="form-row">
+        <div class="form-group">
+          <label for="engineSize">Engine Size (CC) *</label>
+          <input 
+            type="number" 
+            id="engineSize"
+            [(ngModel)]="vehicle.engineSize"
+            name="engineSize"
+            placeholder="e.g., 600"
+            min="50"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="bikeType">Bike Type *</label>
+          <select 
+            id="bikeType"
+            [(ngModel)]="vehicle.bikeType"
+            name="bikeType"
+            required
+          >
+            <option value="">Select Bike Type</option>
+            @for (bikeType of bikeTypes; track bikeType) {
+              <option [value]="bikeType">{{ bikeType }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Leisure specific fields -->
+      <div *ngIf="vehicle.category === 'Leisure'" class="form-row">
+        <div class="form-group">
+          <label for="leisureType">Leisure Type *</label>
+          <select 
+            id="leisureType"
+            [(ngModel)]="vehicle.leisureType"
+            name="leisureType"
+            required
+          >
+            <option value="">Select Leisure Type</option>
+            @for (leisureType of leisureTypes; track leisureType) {
+              <option [value]="leisureType">{{ leisureType }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="length">Length (feet)</label>
+          <input 
+            type="number" 
+            id="length"
+            [(ngModel)]="vehicle.length"
+            name="length"
+            placeholder="e.g., 28"
+            min="1"
+          >
+        </div>
+      </div>
+      <div *ngIf="vehicle.category === 'Leisure'" class="form-row">
+        <div class="form-group">
+          <label for="capacity">Passenger Capacity</label>
+          <input 
+            type="number" 
+            id="capacity"
+            [(ngModel)]="vehicle.capacity"
+            name="capacity"
+            placeholder="e.g., 8"
+            min="1"
+          >
+        </div>
+      </div>
+
+      <!-- Commercial specific fields -->
+      <div *ngIf="vehicle.category === 'Commercial'" class="form-row">
+        <div class="form-group">
+          <label for="commercialType">Commercial Type *</label>
+          <select 
+            id="commercialType"
+            [(ngModel)]="vehicle.commercialType"
+            name="commercialType"
+            required
+          >
+            <option value="">Select Commercial Type</option>
+            @for (commercialType of commercialTypes; track commercialType) {
+              <option [value]="commercialType">{{ commercialType }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="payload">Payload (tons)</label>
+          <input 
+            type="number" 
+            id="payload"
+            [(ngModel)]="vehicle.payload"
+            name="payload"
+            placeholder="e.g., 1.5"
+            min="0"
+            step="0.1"
+          >
+        </div>
+      </div>
+      <div *ngIf="vehicle.category === 'Commercial'" class="form-row">
+        <div class="form-group">
+          <label for="licenseType">License Type Required</label>
+          <select 
+            id="licenseType"
+            [(ngModel)]="vehicle.licenseType"
+            name="licenseType"
+          >
+            <option value="">Select License Type</option>
+            @for (licenseType of licenseTypes; track licenseType) {
+              <option [value]="licenseType">{{ licenseType }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Pricing & Details</h3>
+      
+      <div class="form-group">
+        <label for="price">Asking Price *</label>
+        <input 
+          type="number" 
+          id="price"
+          [(ngModel)]="vehicle.price"
+          name="price"
+          placeholder="e.g., 25000"
+          min="1"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea 
+          id="description"
+          [(ngModel)]="vehicle.description"
+          name="description"
+          placeholder="Describe your vehicle's condition, features, and any additional information..."
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="imageUrl">Image URL</label>
+        <input 
+          type="url" 
+          id="imageUrl"
+          [(ngModel)]="vehicle.imageUrl"
+          name="imageUrl"
+          placeholder="https://example.com/car-image.jpg"
+        >
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Contact Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="sellerName">Your Name *</label>
+          <input 
+            type="text" 
+            id="sellerName"
+            [(ngModel)]="vehicle.sellerName"
+            name="sellerName"
+            placeholder="e.g., John Smith"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="sellerContact">Contact Email *</label>
+          <input 
+            type="email" 
+            id="sellerContact"
+            [(ngModel)]="vehicle.sellerContact"
+            name="sellerContact"
+            placeholder="e.g., john@email.com"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location *</label>
+        <input 
+          type="text" 
+          id="location"
+          [(ngModel)]="vehicle.location"
+          name="location"
+          placeholder="e.g., New York, NY"
+          required
+        >
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="onCancel()" class="cancel-btn">
+        Cancel
+      </button>
+      <button type="submit" class="submit-btn">
+        List My Vehicle
+      </button>
+    </div>
+  </form>
+</div>

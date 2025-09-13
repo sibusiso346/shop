@@ -1,0 +1,496 @@
+<div class="admin-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="header-content">
+      <h1>Admin Dashboard</h1>
+      <p>Review and approve vehicle photos</p>
+    </div>
+    <div class="header-actions">
+      <button class="refresh-btn" (click)="applyFilters()" [disabled]="isProcessing">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23,4 23,10 17,10"/>
+          <polyline points="1,20 1,14 7,14"/>
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+          <line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ adminStats.totalVehicles }}</h3>
+        <p>Total Vehicles</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ adminStats.pendingPhotos }}</h3>
+        <p>Pending Photos</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon approved">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22,4 12,14.01 9,11.01"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ adminStats.approvedToday }}</h3>
+        <p>Approved Today</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon rejected">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ adminStats.rejectedToday }}</h3>
+        <p>Rejected Today</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="statusFilter">Status</label>
+        <select id="statusFilter" [(ngModel)]="statusFilter" (change)="applyFilters()">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="partial">Partial</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="categoryFilter">Category</label>
+        <select id="categoryFilter" [(ngModel)]="categoryFilter" (change)="applyFilters()">
+          <option value="all">All Categories</option>
+          <option value="Cars">Cars</option>
+          <option value="Bikes">Bikes</option>
+          <option value="Leisure">Leisure</option>
+          <option value="Commercial">Commercial</option>
+        </select>
+      </div>
+
+      <div class="filter-group search-group">
+        <label for="searchTerm">Search</label>
+        <div class="search-input">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input 
+            type="text" 
+            id="searchTerm"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Search by vehicle, seller..."
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicles Table -->
+  <div class="vehicles-section">
+    <div class="section-header">
+      <h2>Vehicle Reviews ({{ filteredVehicles.length }})</h2>
+      <div class="view-controls">
+        <span class="results-info">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, filteredVehicles.length) }} of {{ filteredVehicles.length }}
+        </span>
+      </div>
+    </div>
+
+    @if (filteredVehicles.length === 0) {
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.7 9H5.3l-1.8 2.1C3.2 11.3 2.5 12.1 2.5 13v3c0 .6.4 1 1 1h2m14 0H5m14 0v3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-3m7-13h2a2 2 0 0 1 2 2v1H6V4a2 2 0 0 1 2-2h2m0 0h4m-4 0V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v1"/>
+        </svg>
+        <h3>No vehicles found</h3>
+        <p>No vehicles match your current filters</p>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table class="vehicles-table">
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Category</th>
+              <th>Seller</th>
+              <th>Photos</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (vehicleReview of getPaginatedVehicles(); track vehicleReview.vehicle.id) {
+              <tr class="vehicle-row">
+                <td class="vehicle-info">
+                  <div class="vehicle-details">
+                    <div class="vehicle-image">
+                      @if (vehicleReview.vehicle.imageUrl) {
+                        <img [src]="vehicleReview.vehicle.imageUrl" [alt]="vehicleReview.vehicle.make + ' ' + vehicleReview.vehicle.model">
+                      } @else {
+                        <div class="no-image">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21,15 16,10 5,21"/>
+                          </svg>
+                        </div>
+                      }
+                    </div>
+                    <div class="vehicle-text">
+                      <h4>{{ vehicleReview.vehicle.make }} {{ vehicleReview.vehicle.model }}</h4>
+                      <p>{{ vehicleReview.vehicle.year }} • {{ vehicleReview.vehicle.price | currency:'USD':'symbol':'1.0-0' }}</p>
+                      <p class="location">{{ vehicleReview.vehicle.location }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="category">
+                  <span class="category-badge">{{ vehicleReview.vehicle.category }}</span>
+                </td>
+                <td class="seller">
+                  <div class="seller-info">
+                    <p class="seller-name">{{ vehicleReview.vehicle.sellerName }}</p>
+                    <p class="seller-contact">{{ vehicleReview.vehicle.sellerContact }}</p>
+                  </div>
+                </td>
+                <td class="photos-count">
+                  <div class="photos-summary">
+                    <div class="photo-stats">
+                      <span class="total">{{ vehicleReview.totalPhotos }} photos</span>
+                      <div class="photo-breakdown">
+                        @if (vehicleReview.pendingCount > 0) {
+                          <span class="pending">{{ vehicleReview.pendingCount }} pending</span>
+                        }
+                        @if (vehicleReview.approvedCount > 0) {
+                          <span class="approved">{{ vehicleReview.approvedCount }} approved</span>
+                        }
+                        @if (vehicleReview.rejectedCount > 0) {
+                          <span class="rejected">{{ vehicleReview.rejectedCount }} rejected</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="status">
+                  <div class="status-badge" [class]="getStatusClass(vehicleReview.overallStatus)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      @switch (getStatusIcon(vehicleReview.overallStatus)) {
+                        @case ('check-circle') {
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                          <polyline points="22,4 12,14.01 9,11.01"/>
+                        }
+                        @case ('x-circle') {
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="15" y1="9" x2="9" y2="15"/>
+                          <line x1="9" y1="9" x2="15" y2="15"/>
+                        }
+                        @case ('clock') {
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12,6 12,12 16,14"/>
+                        }
+                        @case ('alert-circle') {
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="12" y1="8" x2="12" y2="12"/>
+                          <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        }
+                      }
+                    </svg>
+                    <span>{{ vehicleReview.overallStatus | titlecase }}</span>
+                  </div>
+                </td>
+                <td class="last-updated">
+                  <span class="date">{{ formatDate(vehicleReview.lastUpdated) }}</span>
+                  <span class="relative">{{ getRelativeTime(vehicleReview.lastUpdated) }}</span>
+                </td>
+                <td class="actions">
+                  <button 
+                    class="view-photos-btn"
+                    (click)="selectVehicle(vehicleReview)"
+                    [disabled]="isProcessing"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21,15 16,10 5,21"/>
+                    </svg>
+                    View Photos
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1"
+            (click)="goToPage(currentPage - 1)"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15,18 9,12 15,6"/>
+            </svg>
+            Previous
+          </button>
+
+          <div class="page-numbers">
+            @for (page of getPageNumbers(); track page) {
+              <button 
+                class="page-number" 
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+          </div>
+
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages"
+            (click)="goToPage(currentPage + 1)"
+          >
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9,18 15,12 9,6"/>
+            </svg>
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Photos Modal -->
+  @if (showPhotosModal && selectedVehicle) {
+    <div class="modal-overlay" (click)="closePhotosModal()">
+      <div class="modal-content photos-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ selectedVehicle.vehicle.make }} {{ selectedVehicle.vehicle.model }} - Photos</h3>
+          <button class="close-btn" (click)="closePhotosModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="vehicle-summary">
+            <div class="vehicle-info">
+              <h4>{{ selectedVehicle.vehicle.make }} {{ selectedVehicle.vehicle.model }}</h4>
+              <p>{{ selectedVehicle.vehicle.year }} • {{ selectedVehicle.vehicle.category }}</p>
+              <p>Seller: {{ selectedVehicle.vehicle.sellerName }}</p>
+            </div>
+            <div class="photo-stats">
+              <div class="stat">
+                <span class="label">Total Photos:</span>
+                <span class="value">{{ selectedVehicle.totalPhotos }}</span>
+              </div>
+              <div class="stat">
+                <span class="label">Pending:</span>
+                <span class="value pending">{{ selectedVehicle.pendingCount }}</span>
+              </div>
+              <div class="stat">
+                <span class="label">Approved:</span>
+                <span class="value approved">{{ selectedVehicle.approvedCount }}</span>
+              </div>
+              <div class="stat">
+                <span class="label">Rejected:</span>
+                <span class="value rejected">{{ selectedVehicle.rejectedCount }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="photos-grid">
+            @for (photo of selectedVehicle.photos; track photo.id) {
+              <div class="photo-card" [class.selected]="selectedPhoto?.id === photo.id">
+                <div class="photo-preview">
+                  <img [src]="photo.photoUrl" [alt]="photo.category + ' view'">
+                  
+                  <!-- Status Badge -->
+                  <div class="status-badge" [class]="getStatusClass(photo.status)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      @switch (getStatusIcon(photo.status)) {
+                        @case ('check-circle') {
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                          <polyline points="22,4 12,14.01 9,11.01"/>
+                        }
+                        @case ('x-circle') {
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="15" y1="9" x2="9" y2="15"/>
+                          <line x1="9" y1="9" x2="15" y2="15"/>
+                        }
+                        @case ('clock') {
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12,6 12,12 16,14"/>
+                        }
+                      }
+                    </svg>
+                    <span>{{ photo.status | titlecase }}</span>
+                  </div>
+
+                  <!-- Category Badge -->
+                  <div class="category-badge">
+                    <span>{{ photo.category | titlecase }}</span>
+                  </div>
+                </div>
+
+                <div class="photo-info">
+                  <div class="photo-meta">
+                    <div class="meta-item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                      </svg>
+                      <span>{{ getRelativeTime(photo.uploadedAt) }}</span>
+                    </div>
+                    
+                    @if (photo.reviewedAt) {
+                      <div class="meta-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>{{ photo.reviewedBy }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  @if (photo.rejectionReason) {
+                    <div class="rejection-reason">
+                      <strong>Rejection Reason:</strong> {{ photo.rejectionReason }}
+                    </div>
+                  }
+                </div>
+
+                <div class="photo-actions">
+                  @if (photo.status === 'pending') {
+                    <button class="action-btn approve" (click)="approvePhoto(photo)" [disabled]="isProcessing">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22,4 12,14.01 9,11.01"/>
+                      </svg>
+                      Approve
+                    </button>
+                    <button class="action-btn reject" (click)="rejectPhoto(photo)" [disabled]="isProcessing">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                      </svg>
+                      Reject
+                    </button>
+                  } @else {
+                    <div class="status-info">
+                      <span class="status-text" [class]="getStatusClass(photo.status)">
+                        {{ photo.status | titlecase }}
+                      </span>
+                      @if (photo.reviewedAt) {
+                        <span class="review-date">{{ formatDate(photo.reviewedAt) }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Rejection Modal -->
+  @if (showRejectionModal) {
+    <div class="modal-overlay" (click)="cancelRejection()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Reject Photo</h3>
+          <button class="close-btn" (click)="cancelRejection()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          @if (selectedPhoto) {
+            <div class="rejection-preview">
+              <img [src]="selectedPhoto.photoUrl" [alt]="selectedPhoto.category + ' view'">
+              <div class="preview-info">
+                <h4>{{ selectedPhoto.vehicle.make }} {{ selectedPhoto.vehicle.model }}</h4>
+                <p>{{ selectedPhoto.category | titlecase }} View</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="rejectionReason">Rejection Reason *</label>
+              <textarea 
+                id="rejectionReason"
+                [(ngModel)]="rejectionReason"
+                placeholder="Please provide a reason for rejecting this photo..."
+                rows="4"
+                required
+              ></textarea>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="cancelRejection()" [disabled]="isProcessing">
+            Cancel
+          </button>
+          <button 
+            class="btn-danger" 
+            (click)="confirmRejection()" 
+            [disabled]="isProcessing || !rejectionReason.trim()"
+          >
+            @if (isProcessing) {
+              <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 11-6.219-8.56"/>
+              </svg>
+              Processing...
+            } @else {
+              Reject Photo
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
